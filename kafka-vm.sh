@@ -60,6 +60,7 @@ echo "Setting up directories..."
 sudo mkdir -p "$DATA_DIR" "$LOG_DIR"
 sudo chown -R $USER:$USER "$INSTALL_DIR" "$DATA_DIR" "$LOG_DIR"
 
+sudo mkdir -p "$INSTALL_DIR/config/kraft"
 # Step 6: Configure Kafka (KRaft)
 CONFIG_FILE="$INSTALL_DIR/config/kraft/server.properties"
 cat <<EOF | sudo tee $CONFIG_FILE > /dev/null
