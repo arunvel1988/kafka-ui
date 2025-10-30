@@ -217,7 +217,7 @@ def create_kafka_compose_file(version, container_name):
 version: '3.8'
 services:
   zookeeper:
-    image: bitnami/zookeeper:3.9
+    image: bitnami/zookeeper:latest
     container_name: {container_name}-zookeeper
     ports:
       - "{zk_port}:2181"
