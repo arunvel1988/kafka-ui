@@ -202,6 +202,7 @@ def get_random_port(start=4000, end=9000):
 
 
 def create_kafka_compose_file(version, container_name):
+    import os
     os.makedirs("compose_files", exist_ok=True)
     os.makedirs("kafka_clusters", exist_ok=True)
 
@@ -218,16 +219,16 @@ version: '3.8'
 services:
   kafka-1:
     image: apache/kafka:latest
-    container_name: kafka-1
-    hostname: kafka-1
+    container_name: {container_name}-1
+    hostname: {container_name}-1
     ports:
-      - 9092:9092
+      - {broker_ports[0]}:9092
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:29093,2@kafka-2:29093,3@kafka-3:29093
-      KAFKA_LISTENERS: PLAINTEXT://kafka-1:9092,CONTROLLER://kafka-1:29093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@{container_name}-1:29093,2@{container_name}-2:29093,3@{container_name}-3:29093
+      KAFKA_LISTENERS: PLAINTEXT://{container_name}-1:9092,CONTROLLER://{container_name}-1:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://{container_name}-1:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
@@ -237,16 +238,16 @@ services:
 
   kafka-2:
     image: apache/kafka:latest
-    container_name: kafka-2
-    hostname: kafka-2
+    container_name: {container_name}-2
+    hostname: {container_name}-2
     ports:
-      - 9093:9093
+      - {broker_ports[1]}:9093
     environment:
       KAFKA_NODE_ID: 2
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:29093,2@kafka-2:29093,3@kafka-3:29093
-      KAFKA_LISTENERS: PLAINTEXT://kafka-2:9093,CONTROLLER://kafka-2:29093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@{container_name}-1:29093,2@{container_name}-2:29093,3@{container_name}-3:29093
+      KAFKA_LISTENERS: PLAINTEXT://{container_name}-2:9093,CONTROLLER://{container_name}-2:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://{container_name}-2:9093
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
@@ -256,16 +257,16 @@ services:
 
   kafka-3:
     image: apache/kafka:latest
-    container_name: kafka-3
-    hostname: kafka-3
+    container_name: {container_name}-3
+    hostname: {container_name}-3
     ports:
-      - 9094:9094
+      - {broker_ports[2]}:9094
     environment:
       KAFKA_NODE_ID: 3
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:29093,2@kafka-2:29093,3@kafka-3:29093
-      KAFKA_LISTENERS: PLAINTEXT://kafka-3:9094,CONTROLLER://kafka-3:29093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9094
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@{container_name}-1:29093,2@{container_name}-2:29093,3@{container_name}-3:29093
+      KAFKA_LISTENERS: PLAINTEXT://{container_name}-3:9094,CONTROLLER://{container_name}-3:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://{container_name}-3:9094
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
@@ -275,11 +276,11 @@ services:
 
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
-    container_name: kafdrop
+    container_name: {container_name}-ui
     ports:
-      - 9002:9000
+      - {kafdrop_port}:9000
     environment:
-      KAFKA_BROKERCONNECT: "kafka-1:9092,kafka-2:9093,kafka-3:9094"
+      KAFKA_BROKERCONNECT: "{container_name}-1:9092,{container_name}-2:9093,{container_name}-3:9094"
       SERVER_PORT: 9000
     depends_on:
       - kafka-1
@@ -292,6 +293,14 @@ networks:
   kafka-net:
     driver: bridge
 """
+
+    file_path = os.path.join(cluster_dir, "docker-compose.yml")
+    with open(file_path, "w") as f:
+        f.write(compose_content)
+
+    # ✅ FIX: Return all 4 values
+    return file_path, zk_port, broker_ports, kafdrop_port
+
 ########################### kafka cluster setup = end #################################
 
 
