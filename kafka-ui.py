@@ -96,7 +96,7 @@ def install_package(tool, os_family):
 
 @app.route("/pre-req")
 def prereq():
-    tools = ["pip3", "openssl", "docker", "terraform","docker-compose"]
+    tools = ["pip3", "openssl", "docker","docker-compose"]
     results = {}
     os_family = get_os_family()
 
