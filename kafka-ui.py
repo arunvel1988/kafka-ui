@@ -215,11 +215,7 @@ def create_kafka_compose_file(version, container_name):
 
     compose_content = f"""
 version: '3.8'
-
 services:
-  # =====================================================
-  # 🧠 Kafka Controller + Broker 1
-  # =====================================================
   kafka-1:
     image: apache/kafka:latest
     container_name: kafka-1
@@ -229,24 +225,16 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:29093,2@kafka-2:29093,3@kafka-3:29093
+      KAFKA_LISTENERS: PLAINTEXT://kafka-1:9092,CONTROLLER://kafka-1:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://kafka-1:9092,CONTROLLER://kafka-1:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
-    volumes:
-      - ./data/kafka-1:/tmp/kraft-combined-logs
-    restart: unless-stopped
+    networks:
+      - kafka-net
 
-  # =====================================================
-  # 🧩 Kafka Broker 2
-  # =====================================================
   kafka-2:
     image: apache/kafka:latest
     container_name: kafka-2
@@ -256,26 +244,16 @@ services:
     environment:
       KAFKA_NODE_ID: 2
       KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:29093,2@kafka-2:29093,3@kafka-3:29093
+      KAFKA_LISTENERS: PLAINTEXT://kafka-2:9093,CONTROLLER://kafka-2:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9093
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://kafka-2:9093,CONTROLLER://kafka-2:9094
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9093
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9094,3@kafka-3:9095
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
-    volumes:
-      - ./data/kafka-2:/tmp/kraft-combined-logs
-    restart: unless-stopped
-    depends_on:
-      - kafka-1
+    networks:
+      - kafka-net
 
-  # =====================================================
-  # ⚙️ Kafka Broker 3
-  # =====================================================
   kafka-3:
     image: apache/kafka:latest
     container_name: kafka-3
@@ -285,49 +263,34 @@ services:
     environment:
       KAFKA_NODE_ID: 3
       KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:29093,2@kafka-2:29093,3@kafka-3:29093
+      KAFKA_LISTENERS: PLAINTEXT://kafka-3:9094,CONTROLLER://kafka-3:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9094
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://kafka-3:9094,CONTROLLER://kafka-3:9095
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9094
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9094,3@kafka-3:9095
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
-    volumes:
-      - ./data/kafka-3:/tmp/kraft-combined-logs
-    restart: unless-stopped
-    depends_on:
-      - kafka-1
-      - kafka-2
+    networks:
+      - kafka-net
 
-  # =====================================================
-  # 📊 Kafka UI (Kafdrop)
-  # =====================================================
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
     container_name: kafdrop
     ports:
       - 9002:9000
     environment:
-      KAFKA_BROKERCONNECT: kafka-1:9092,kafka-2:9093,kafka-3:9094
-      JVM_OPTS: "-Xms32M -Xmx64M"
+      KAFKA_BROKERCONNECT: "kafka-1:9092,kafka-2:9093,kafka-3:9094"
       SERVER_PORT: 9000
     depends_on:
       - kafka-1
       - kafka-2
       - kafka-3
-    restart: unless-stopped
+    networks:
+      - kafka-net
 
-"""
-
-    file_path = f"compose_files/{container_name}.yml"
-    with open(file_path, "w") as f:
-        f.write(compose_content)
-
-    return file_path, zk_port, broker_ports, kafdrop_port
+networks:
+  kafka-net:
+    driver: bridge
 
 ########################### kafka cluster setup = end #################################
 
