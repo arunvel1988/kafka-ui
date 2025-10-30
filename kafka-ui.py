@@ -217,14 +217,14 @@ def create_kafka_compose_file(version, container_name):
 version: '3.8'
 services:
   zookeeper:
-    image: wurstmeister/zookeeper:3.4.6
+    image: bitnami/zookeeper:3.9
     container_name: {container_name}-zookeeper
     ports:
       - "{zk_port}:2181"
     restart: always
 
   kafka1:
-    image: wurstmeister/kafka:{version}
+    image: bitnami/kafka:{version}    
     container_name: {container_name}-broker1
     ports:
       - "{broker_ports[0]}:9092"
@@ -239,7 +239,7 @@ services:
     restart: always
 
   kafka2:
-    image: wurstmeister/kafka:{version}
+    image: bitnami/kafka:{version} 
     container_name: {container_name}-broker2
     ports:
       - "{broker_ports[1]}:9092"
@@ -254,7 +254,7 @@ services:
     restart: always
 
   kafka3:
-    image: wurstmeister/kafka:{version}
+    image: bitnami/kafka:{version} 
     container_name: {container_name}-broker3
     ports:
       - "{broker_ports[2]}:9092"
