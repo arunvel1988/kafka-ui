@@ -306,8 +306,29 @@ networks:
 
 
 
+@app.route("/kafka/clusters")
+def kafka_clusters():
+    """
+    List all running Kafka containers based on image name (not container name).
+    """
+    containers = client.containers.list()
+    kafka_containers = []
+
+    for container in containers:
+        image_name = container.image.tags[0] if container.image.tags else ""
+        if "kafka" in image_name.lower():  # <-- match by image name
+            info = {
+                "name": container.name,
+                "status": container.status,
+                "image": image_name,
+                "ip": container.attrs['NetworkSettings']['IPAddress']
+            }
+            kafka_containers.append(info)
+
+    return render_template("kafka_clusters.html", clusters=kafka_containers)
 
 
+########################################################################################################################
 
 def run_docker_compose(compose_file, container_name):
     try:
