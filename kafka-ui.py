@@ -291,7 +291,7 @@ services:
 networks:
   kafka-net:
     driver: bridge
-
+"""
 ########################### kafka cluster setup = end #################################
 
 
