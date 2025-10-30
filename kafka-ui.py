@@ -310,7 +310,7 @@ services:
     image: obsidiandynamics/kafdrop:latest
     container_name: kafdrop
     ports:
-      - 9000:9000
+      - 9002:9000
     environment:
       KAFKA_BROKERCONNECT: kafka-1:9092,kafka-2:9093,kafka-3:9094
       JVM_OPTS: "-Xms32M -Xmx64M"
