@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kafka Cluster Playground</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #ffe0b2, #fff3e0);
+      color: #333;
+      padding: 50px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .container:hover {
+      transform: scale(1.01);
+    }
+
+    h1 {
+      color: #e65100;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    h1 span {
+      font-size: 2.8rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      line-height: 1.7;
+    }
+
+    ul {
+      margin-top: 20px;
+      padding-left: 20px;
+    }
+
+    ul li {
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 14px 30px;
+      font-size: 1.1rem;
+      background: linear-gradient(to right, #ff9800, #f57c00);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: linear-gradient(to right, #ef6c00, #e65100);
+    }
+
+    .link-docs {
+      display: inline-block;
+      margin-top: 20px;
+      color: #e65100;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .link-docs:hover {
+      text-decoration: underline;
+    }
+
+    .emoji {
+      font-size: 1.4rem;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span></span> Kafka Cluster Playground</h1>
+    <p>Welcome to your <strong>Kafka learning lab</strong>!  
+      This playground helps you spin up and explore distributed messaging with Apache Kafka.</p>
+
+    <ul>
+      <li>Understand how <strong>Zookeeper</strong> coordinates Kafka brokers</li>
+      <li>Deploy a <strong>3-broker Kafka cluster</strong> for real distributed messaging</li>
+      <li>Explore <strong>topics, partitions, producers, and consumers</strong></li>
+      <li>Visualize messages using <strong>Kafdrop UI</strong></li>
+      <li>Learn <strong>replication, leader election,</strong> and <strong>fault tolerance</strong></li>
+    </ul>
+
+    <a class="link-docs" href="https://kafka.apache.org/documentation/" target="_blank">📖 Apache Kafka Official Docs</a><br>
+    <a class="link-docs" href="https://docs.confluent.io/platform/current/overview.html" target="_blank">📖 Confluent Kafka Platform Docs</a><br>
+
+    <a class="btn" href="/pre-req">🔧 Check Kafka Lab Prerequisites</a>
+  </div>
+</body>
+</html>

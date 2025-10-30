@@ -1,2 +1,2 @@
-# kafka-ui
-kafka-ui
+# linux-ui
+linux-ui

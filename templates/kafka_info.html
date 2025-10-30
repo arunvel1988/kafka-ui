@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kafka Overview</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f4f6f8;
+            padding: 50px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff6600;
+        }
+        .btn {
+            display: inline-block;
+            margin: 20px 10px 0 0;
+            padding: 12px 25px;
+            background-color: #ff6600;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .btn:hover {
+            background-color: #cc5200;
+        }
+        .btn-back {
+            margin-top: 30px;
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+        ul li {
+            margin-bottom: 10px;
+        }
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Apache Kafka Overview</h1>
+        <p>
+            <strong>Apache Kafka</strong> is a distributed event streaming platform used for building real-time data pipelines and streaming applications. 
+            It’s designed to handle high throughput, low-latency data transfer between systems.
+        </p>
+
+        <ul>
+            <li><strong>Producer:</strong> Sends data (messages) to Kafka topics.</li>
+            <li><strong>Broker:</strong> A Kafka server that stores and serves messages.</li>
+            <li><strong>Consumer:</strong> Reads messages from topics for processing.</li>
+            <li><strong>Topic:</strong> A logical channel where messages are published.</li>
+            <li><strong>Zookeeper:</strong> (Legacy) Used for managing Kafka cluster metadata (being replaced by KRaft).</li>
+            <li><strong>KRaft Mode:</strong> The modern Kafka mode that removes the need for Zookeeper.</li>
+        </ul>
+
+        <p>How would you like to proceed?</p>
+        <a class="btn" href="/kafka/setup">Kafka Cluster Setup</a>
+        <a class="btn" href="/kafka/labs">Kafka Hands-on Labs</a>
+        <a class="btn" href="/kafka/kraft">KRaft (Zookeeper-less) Kafka</a>
+        <br>
+        <a class="btn-back" href="/">⬅ Back to Home</a>
+    </div>
+</body>
+</html>

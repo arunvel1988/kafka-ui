@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kafka Cluster Setup</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f4f6f8;
+            padding: 50px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff6f00;
+            margin-bottom: 20px;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .info-box {
+            background-color: #fff8e1;
+            border-left: 6px solid #ff6f00;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-top: 8px;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 12px 25px;
+            background-color: #ff6f00;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #e65100;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        li strong {
+            color: #ff6f00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Kafka Cluster Setup</h1>
+
+        <div class="info-box">
+            <p>
+                <strong>Apache Kafka</strong> is a distributed streaming platform used for building real-time data pipelines and streaming applications.
+                <br>It consists of:
+            </p>
+            <ul>
+                <li><strong>Zookeeper</strong> – Manages and coordinates Kafka brokers</li>
+                <li><strong>Kafka Brokers</strong> – Store and distribute messages</li>
+                <li><strong>Kafdrop</strong> – Web UI to monitor topics, partitions, and messages</li>
+            </ul>
+        </div>
+
+        <form method="POST" action="/kafka/setup">
+            <div class="form-group">
+                <label for="name">Cluster Name:</label>
+                <input type="text" id="name" name="name" placeholder="e.g. student1-kafka" required>
+            </div>
+
+            <div class="form-group">
+                <label for="version">Kafka Version:</label>
+                <input type="text" id="version" name="version" value="2.13-3.6.1" required>
+            </div>
+
+            <button class="btn" type="submit">⚙️ Launch Kafka Cluster</button>
+        </form>
+
+        <a class="btn-back" href="/">⬅ Back to Home</a>
+    </div>
+</body>
+</html>
