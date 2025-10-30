@@ -367,79 +367,7 @@ def kafka_setup():
 
 
 
-@app.route("/linux/desktop", methods=["GET", "POST"])
-def linux_desktop():
-    if request.method == "POST":
-        version = request.form["version"]  # e.g. ubuntudesktop
-        name = request.form["name"].strip() or generate_random_name("linuxdesk")
-        path, container, ssh_port = create_linux_compose_file(version, name)
-        run_docker_compose(path, container)
-        return render_template("success.html", os_type="Linux Desktop", version=version, container=container, rdp=ssh_port, web=None)
-    return render_template("linux_desktop.html")
 
-
-@app.route("/linux/server/install/<version>")
-def install_linux_server(version):
-    name = generate_random_name("linuxsrv")
-    path, container, ssh_port = create_linux_compose_file(version, name)
-    run_docker_compose(path, container)
-    return render_template("success.html", os_type="Linux Server", version=version, container=container, rdp=ssh_port, web=None)
-
-@app.route("/linux/desktop/install/<version>")
-def install_linux_desktop(version):
-    name = generate_random_name("linuxdesk")
-    path, container, ssh_port = create_linux_compose_file(version, name)
-    run_docker_compose(path, container)
-    return render_template("success.html", os_type="Linux Desktop", version=version, container=container, rdp=ssh_port, web=None)
-
-
-@app.route("/linux/server/server_list")
-def list_linux_servers():
-    containers = []
-    for c in client.containers.list():
-        try:
-            if c.image.tags and (
-                c.image.tags[0].startswith("redhat/ubi") or 
-                "arunvel1988/rhel" in c.image.tags[0]
-            ):
-                version = c.image.tags[0].split(":")[0].split("/")[-1]
-                containers.append({
-                    "name": c.name,
-                    "status": c.status,
-                    "image": c.image.tags[0],
-                    "version": version,
-                    "ports": ", ".join([
-                        f"{container_port}->{details[0]['HostPort']}"
-                        for container_port, details in (c.attrs['NetworkSettings']['Ports'] or {}).items()
-                        if details
-                    ])
-                })
-        except Exception as e:
-            print(f"[!] Skipped container {c.name} due to error: {e}")
-    return render_template("list.html", os_type="Linux Server", containers=containers)
-
-
-@app.route("/linux/desktop/desktop_list")
-def list_linux_desktops():
-    containers = []
-    for c in client.containers.list():
-        try:
-            if c.image.tags and "ubuntu" in c.image.tags[0]:
-                version = c.image.tags[0].split(":")[0].split("/")[-1]
-                containers.append({
-                    "name": c.name,
-                    "status": c.status,
-                    "image": c.image.tags[0],
-                    "version": version,
-                    "ports": ", ".join([
-                        f"{container_port}->{details[0]['HostPort']}"
-                        for container_port, details in (c.attrs['NetworkSettings']['Ports'] or {}).items()
-                        if details
-                    ])
-                })
-        except Exception as e:
-            print(f"[!] Skipped container {c.name} due to error: {e}")
-    return render_template("list.html", os_type="Linux Desktop", containers=containers)
 
 
 
