@@ -2,7 +2,7 @@
 set -e
 
 
-KAFKA_VERSION="3.7.0"
+KAFKA_VERSION="4.0.1"
 SCALA_VERSION="2.13"
 INSTALL_DIR="/opt/kafka"
 DATA_DIR="/var/lib/kafka"
