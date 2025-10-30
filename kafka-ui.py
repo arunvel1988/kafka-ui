@@ -215,72 +215,112 @@ def create_kafka_compose_file(version, container_name):
 
     compose_content = f"""
 version: '3.8'
+
 services:
-  zookeeper:
-    image: bitnami/zookeeper:latest
-    container_name: {container_name}-zookeeper
+  # =====================================================
+  # 🧠 Kafka Controller + Broker 1
+  # =====================================================
+  kafka-1:
+    image: apache/kafka:latest
+    container_name: kafka-1
+    hostname: kafka-1
     ports:
-      - "{zk_port}:2181"
-    restart: always
-
-  kafka1:
-    image: bitnami/kafka:{version}    
-    container_name: {container_name}-broker1
-    ports:
-      - "{broker_ports[0]}:9092"
+      - 9092:9092
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:{broker_ports[0]}
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://kafka-1:9092,CONTROLLER://kafka-1:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-      KAFKA_MIN_INSYNC_REPLICAS: 2
-    depends_on:
-      - zookeeper
-    restart: always
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    volumes:
+      - ./data/kafka-1:/tmp/kraft-combined-logs
+    restart: unless-stopped
 
-  kafka2:
-    image: bitnami/kafka:{version} 
-    container_name: {container_name}-broker2
+  # =====================================================
+  # 🧩 Kafka Broker 2
+  # =====================================================
+  kafka-2:
+    image: apache/kafka:latest
+    container_name: kafka-2
+    hostname: kafka-2
     ports:
-      - "{broker_ports[1]}:9092"
+      - 9093:9093
     environment:
-      KAFKA_BROKER_ID: 2
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:{broker_ports[1]}
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://kafka-2:9093,CONTROLLER://kafka-2:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9094,3@kafka-3:9095
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    volumes:
+      - ./data/kafka-2:/tmp/kraft-combined-logs
+    restart: unless-stopped
     depends_on:
-      - zookeeper
-    restart: always
+      - kafka-1
 
-  kafka3:
-    image: bitnami/kafka:{version} 
-    container_name: {container_name}-broker3
+  # =====================================================
+  # ⚙️ Kafka Broker 3
+  # =====================================================
+  kafka-3:
+    image: apache/kafka:latest
+    container_name: kafka-3
+    hostname: kafka-3
     ports:
-      - "{broker_ports[2]}:9092"
+      - 9094:9094
     environment:
-      KAFKA_BROKER_ID: 3
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:{broker_ports[2]}
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://kafka-3:9094,CONTROLLER://kafka-3:9095
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9094
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9094,3@kafka-3:9095
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    volumes:
+      - ./data/kafka-3:/tmp/kraft-combined-logs
+    restart: unless-stopped
     depends_on:
-      - zookeeper
-    restart: always
+      - kafka-1
+      - kafka-2
 
+  # =====================================================
+  # 📊 Kafka UI (Kafdrop)
+  # =====================================================
   kafdrop:
-    image: obsidiandynamics/kafdrop
-    container_name: {container_name}-ui
-    environment:
-      KAFKA_BROKERCONNECT: "kafka1:9092,kafka2:9092,kafka3:9092"
-      JVM_OPTS: "-Xms32M -Xmx64M"
+    image: obsidiandynamics/kafdrop:latest
+    container_name: kafdrop
     ports:
-      - "{kafdrop_port}:9000"
+      - 9000:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka-1:9092,kafka-2:9093,kafka-3:9094
+      JVM_OPTS: "-Xms32M -Xmx64M"
+      SERVER_PORT: 9000
     depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-    restart: always
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    restart: unless-stopped
+
 """
 
     file_path = f"compose_files/{container_name}.yml"
